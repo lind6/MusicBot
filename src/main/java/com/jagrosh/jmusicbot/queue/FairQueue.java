@@ -25,34 +25,58 @@ import java.util.Set;
  * @author John Grosh (jagrosh)
  * @param <T>
  */
-public class FairQueue<T extends Queueable> {
-    private final List<T> list = new ArrayList<>();
+public class FairQueue<T extends Queueable>
+{
+    private final List<T> list  = new ArrayList<>();
     private final Set<Long> set = new HashSet<>();
     
-    public int add(T item)
+    public int add( T item )
     {
         int lastIndex;
-        for(lastIndex=list.size()-1; lastIndex>-1; lastIndex--)
-            if(list.get(lastIndex).getIdentifier()==item.getIdentifier())
-                break;
-        lastIndex++;
-        set.clear();
-        for(; lastIndex<list.size(); lastIndex++)
+
+        for ( lastIndex = list.size() - 1; lastIndex > -1; lastIndex-- )
         {
-            if(set.contains(list.get(lastIndex).getIdentifier()))
+            if ( list.get( lastIndex ).getIdentifier() == item.getIdentifier() )
+            {
                 break;
-            set.add(list.get(lastIndex).getIdentifier());
+            }
         }
-        list.add(lastIndex, item);
+        lastIndex++;
+        
+        set.clear();
+        
+        for ( ; lastIndex < list.size(); lastIndex++ )
+        {
+            if ( set.contains( list.get( lastIndex ).getIdentifier() ) )
+            {
+                break;
+            }
+            set.add( list.get( lastIndex ).getIdentifier() );
+        }
+        list.add( lastIndex, item );
+        
         return lastIndex;
     }
     
-    public void addAt(int index, T item)
+    public void addAt( int index, T item )
     {
-        if(index >= list.size())
-            list.add(item);
-        else
-            list.add(index, item);
+        if ( index >= list.size() )
+        {
+            list.add( item );
+        } else {
+            list.add( index, item );
+        }
+    }
+    
+    /**
+     * append() - Inserts track into queue at last position.
+     *
+     * @param: (T item) track to insert into queue
+     * @return: (void)
+     */
+    public void append( T item )
+    {
+        list.add( item );
     }
     
     public int size()
@@ -75,22 +99,23 @@ public class FairQueue<T extends Queueable> {
         return list;
     }
     
-    public T get(int index)
+    public T get( int index )
     {
-        return list.get(index);
+        return list.get( index );
     }
     
-    public T remove(int index)
+    public T remove( int index )
     {
-        return list.remove(index);
+        return list.remove( index );
     }
     
-    public int removeAll(long identifier)
+    public int removeAll( long identifier )
     {
         int count = 0;
-        for(int i=list.size()-1; i>=0; i--)
+        
+        for ( int i = list.size() - 1; i >= 0; i-- )
         {
-            if(list.get(i).getIdentifier()==identifier)
+            if ( list.get(i).getIdentifier() == identifier )
             {
                 list.remove(i);
                 count++;
@@ -104,29 +129,37 @@ public class FairQueue<T extends Queueable> {
         list.clear();
     }
     
-    public int shuffle(long identifier)
+    public int shuffle( long identifier )
     {
         List<Integer> iset = new ArrayList<>();
-        for(int i=0; i<list.size(); i++)
+        
+        // find indices of tracks belonging to the specified identifier
+        for ( int i = 0; i < list.size(); i++ )
         {
-            if(list.get(i).getIdentifier()==identifier)
+            if ( list.get(i).getIdentifier() == identifier )
+            {
                 iset.add(i);
+            }
         }
-        for(int j=0; j<iset.size(); j++)
+        
+        // shuffle the identified tracks
+        for ( int j = 0; j < iset.size(); j++ )
         {
-            int first = iset.get(j);
-            int second = iset.get((int)(Math.random()*iset.size()));
-            T temp = list.get(first);
-            list.set(first, list.get(second));
-            list.set(second, temp);
+            int first  = iset.get(j);
+            int second = iset.get( (int)( Math.random() * iset.size() ) );
+            T temp     = list.get( first );
+            list.set( first, list.get( second ) );
+            list.set( second, temp );
         }
         return iset.size();
     }
     
-    public void skip(int number)
+    public void skip( int number )
     {
-        for(int i=0; i<number; i++)
+        for ( int i = 0; i < number; i++ )
+        {
             list.remove(0);
+        }
     }
 
     /**
@@ -135,10 +168,10 @@ public class FairQueue<T extends Queueable> {
      * @param to The new position of the item
      * @return the moved item
      */
-    public T moveItem(int from, int to)
+    public T moveItem( int from, int to )
     {
-        T item = list.remove(from);
-        list.add(to, item);
+        T item = list.remove( from );
+        list.add( to, item );
         return item;
     }
 }
